@@ -4,7 +4,7 @@ Python script to upload peat depth survey data to postgres database.
 
 ## Overview
 
-This script formats and uploads files (gpkg, shp) containing peat depth survey and condition data. It uses geopandas, sqlalchemy and geoalchemy2.
+This project formats and uploads files (gpkg, shp) containing peat depth survey and condition data. It uses geopandas, sqlalchemy and geoalchemy2. An accompanying helper script `sheet_to_spatial.py` is included to convert excel files into spatial vector format.
 
 ---
 
@@ -53,6 +53,22 @@ Notice that `gis_env` has replaced `base` in the command line:
 ```
 (gis_env) C:\Users\CLJB3>
 ```
+
+## sheet_to_spatial helper script
+
+This is a simple script that converts excel files into shapefile or geopackage with the correct headers for the `peat_depth_uploader.py` script.
+
+Ensure you are in correct directory and have activate `gis_env` then run as below:
+
+```
+python sheet_to_spatial.py path/to/excel.xlsx path/to/shapefile.shp
+```
+
+Note that at present it assumes the following to be true
+
+* Top two rows of sheet are ignored to skip whitespace and verbose field names
+* Ordering of columns is unchanged - this is important as it renames using column index
+* Data is on sheet 3 of xlsx file - this is to read correct sheet as dataframe
 
 ## Running peat_depth_uploader
 
