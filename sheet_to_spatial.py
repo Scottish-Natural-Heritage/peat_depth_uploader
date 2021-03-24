@@ -6,11 +6,11 @@ Note that this script assumes data in standard peat depth survey template sheet:
 * ordering of columns is unchanged
 * data is on sheet 3 of xlsx file
 todo: add CLI args for sheet/rows to ignore
+todo: make row selection smarter - e.g. search for index of row containing correct headers to remove upto
 """
 import argparse
 import pandas as pd
 import geopandas as gpd
-
 
 
 def file_read(in_path):
