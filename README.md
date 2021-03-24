@@ -10,13 +10,13 @@ This script formats and uploads files (gpkg, shp) containing peat depth survey a
 
 ## Instructions
 
-I recommend creating a conda enviroment to run the script. Conda is an open source package management system, in short it makes the creation and management of virtual environments very easy. As a result it is particularly popular within the field of data science. While this may seem a bit of a pain to get installed, once up and running it will make things much easier in the long run.
+I recommend creating a conda enviroment to run the script. Conda is an open source package management system, in short it makes the creation and management of virtual environments very easy. As a result it is particularly popular within the field of data science. While this may seem a bit of a pain to get installed, once up and running it will make things much easier in the long run. It is also the easiest way to install the open source spatial stack as a virtual environment, which means you can access libraries like geopandas.
 
 ### Installing conda
 
 Conda comes in two forms, the full Anacdona package that comes with  or Miniconda, which only features the essentials. You should use miniconda as we will only need to install the packages we want for a given environment.
 
-[Link to miniconda installer](https://docs.conda.io/en/latest/miniconda.html#windows-installers)
+[Link to miniconda installer](https://docs.conda.io/en/latest/miniconda.html#windows-installers) - Select python3.8 and Windows 64bit version.
 
 Download miniconda and install in your user (e.g. "C:\joe\miniconda")
 
@@ -30,7 +30,13 @@ Once installed, press ![Win key](http://i.stack.imgur.com/T0oPO.png "Windows key
 
 ### Creating a new environment using environments file
 
-First we will create a new environment called `gis_env` using the `environments.yml` file. First navigate to the repo directory using the `cd` command then enter the following:
+First we will create a new environment called `gis_env` using the `environments.yml` file. First navigate to the repo directory using the `cd` (change directory) command:
+
+```
+cd path/to/repository
+```
+
+then enter the following:
 
 ```
 conda env create -f environment.yml
@@ -45,7 +51,7 @@ conda activate gis_env
 Notice that `gis_env` has replaced `base` in the command line:
 
 ```
-(geo_env) C:\Users\CLJB3>
+(gis_env) C:\Users\CLJB3>
 ```
 
 ## Running peat_depth_uploader
