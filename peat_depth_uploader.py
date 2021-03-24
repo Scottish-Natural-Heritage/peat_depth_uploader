@@ -1,6 +1,9 @@
 """
-Outline script to add geometry column to dataframe from grid reference values,
-convert to geodataframe and publish to postgres database.
+Script to upload peat depth survey points to postgres database.
+Takes any spatial file type
+
+Todo - Improve error handling
+Todo - Check for existing data to avoid duplication
 """
 
 from config import *
@@ -10,8 +13,6 @@ import geoalchemy2
 import geopandas as gpd
 import sys
 import re
-
-#os.environ['PROJ_NETWORK'] = 'OFF'
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -74,17 +75,16 @@ parser.add_argument("global_id", help="The global_id for the peat depth data - e
 
 args = parser.parse_args()
 
-
 vector_file = args.filename 
 survey_id = args.survey_id 
 global_id = args.global_id
 
 
 if len(sys.argv) < 4:
-    print("Not enough arguments, enter file path and peatdepth survey ID (e.g. PDS1235)")
-    print("Exiting script")
+    print("\nNot enough arguments, enter file path and peatdepth survey ID (e.g. PDS1235)\n")
+    print("Exiting script\n")
 elif len(sys.argv) > 4:
-    print(f"\nNote: Too many arguments entered, only {vector_file}, {survey_id} and {global_id} will be included\n")
+    print(f"Note: Too many arguments entered, only {vector_file}, {survey_id} and {global_id} will be included\n")
 else:
     pass
 
