@@ -46,57 +46,64 @@ def query_yes_no(question, default="yes"):
             sys.stdout.write("Please respond with 'yes' or 'no' "
                              "(or 'y' or 'n').\n")
 
+def survey_ref_validator(survey_id_arg):
+    """Returns type of survey id / grant reference and validates"""
+    if re.match(r"pds\d{1,}", survey_id_arg.lower()):
+        return "survey_id"
+    elif re.match(r"50\d{4}", survey_id_arg):
+        return "grant_id"
+    else:
+        print("\nInvalid survey ID/grant reference, please enter in format 'PDS###' or '50####'")
+        print("\nExiting script")
+        exit()
+
 def main():
 
     # create sqlalchemy engine to connect to db, note you will need to enter credentials in config.py
     conn_str = f"postgresql://{user}:{password}@{host}/{database}"
     engine = create_engine(conn_str, echo=False)
     connection = engine.connect()
-    schema = 'test_data_model'
+    schema = 'pa_peat_depth'
     table = 'peat_depth'
 
-
+    # field remap dict
     field_dict = {
-        'STATION_ID': 'sample_id',
+        'STATION_ID': 'peat_sample_id',
         'EVENT_DATE': 'survey_date',
         'SURVEYOR': 'surveyor',
         'GPS_ACC': 'gps_accuracy',
         'DEPTH': 'peat_depth',
         'COND': 'peat_condition',
         'NOTES': 'notes',
+        'DM_NOTES': 'data_manager_notes',
         'geometry':'geometry'
     }
 
 
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", help="Filepath of the spatial data to be imported e.g. test_file.shp")
-    parser.add_argument("survey_id", help="The id of the peat depth survey - e.g. PDS1234")
+    parser.add_argument("survey_ref", help="The id of the peat depth survey OR a valid grant reference. If using grant reference ensure this is already present in the database (pa_metadata.grant_reference table")
     parser.add_argument("global_id", help="The global_id for the peat depth data - ensure this is already present in the database (pa_metadata.global_id table)")
 
 
     args = parser.parse_args()
 
-    vector_file = args.filename 
-    survey_id = args.survey_id 
+    vector_file = args.filename
+    survey_ref = args.survey_ref
     global_id = args.global_id
 
+    survey_ref_type = survey_ref_validator(survey_ref)
 
     if len(sys.argv) < 4:
-        print("\nNot enough arguments, enter file path and peatdepth survey ID (e.g. PDS1235)\n")
+        print("\nNot enough arguments, enter file path and peatdepth survey ID / Grant reference (e.g. PDS1235 / 500123)\n")
         print("Exiting script\n")
     elif len(sys.argv) > 4:
-        print(f"Note: Too many arguments entered, only {vector_file}, {survey_id} and {global_id} will be included\n")
+        print(f"Note: Too many arguments entered, only {vector_file}, {survey_ref} and {global_id} will be included\n")
     else:
         pass
 
 
-    # regex to check peat depth survey id fits format of PDS###
-    if re.match(r"pds\d{1,}", survey_id.lower()):
-        pass
-    else:
-        print("\nInvalid peat depth survey ID, please enter in format 'PDS###'")
-        print("\nExiting script")
-        exit()
+    survey_ref_type = survey_ref_validator(survey_ref)
 
 
     # read in file as geodataframe
@@ -106,6 +113,8 @@ def main():
     # Allow user prompt to check information is correct
     print("File information")
     print(f"File name: {vector_file}")
+    print(f"Reference type: {survey_ref_type}")
+    print(f"Survey reference: {survey_ref}")
     print(f"Global ID: {global_id}")
     print(f"Number of records: {len(gdf)}")
 
@@ -123,9 +132,14 @@ def main():
             del gdf[col]
 
 
-    # insert peat depth survey id as 
-    gdf.insert(0, 'survey_id', survey_id)
+    # insert peat depth survey id as
+    if survey_ref_type == 'survey_id':
+        gdf.insert(0, 'peat_depth_survey_id', survey_ref)
+    elif survey_ref_type == 'grant_id':
+        gdf.insert(0, 'grant_id', survey_ref)
+
     gdf.insert(0, 'global_id', global_id)
+
     gdf = gdf.rename(columns=field_dict)
 
 

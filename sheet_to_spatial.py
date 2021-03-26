@@ -13,19 +13,19 @@ import pandas as pd
 import geopandas as gpd
 
 
-def file_read(in_path):
+def file_read(in_path, dtype_dict):
     """selects correct file reader function based on file in/file out"""
     if in_path.endswith('.xlsx'):
-        return pd.read_excel(in_path, skiprows=2, sheet_name=2)
+        return pd.read_excel(in_path, dtype=dtype_dict, skiprows=2, sheet_name=2)
     elif in_path.endswith('.csv'):
-        return pd.read_csv(in_path, skiprows=2)
+        return pd.read_csv(in_path, dtype=dtype_dict, skiprows=2)
 
-def file_write(out_path, geoframe):
+def file_write(out_path, geoframe, schema):
     """selects correct gpd operation to write file"""
     if out_path.endswith('.gpkg'):
-        return geoframe.to_file(out_path, layer='peat_depth', driver='GPKG')
+        return geoframe.to_file(out_path, schema=schema, driver='GPKG')
     elif out_path.endswith('.shp'):
-        return geoframe.to_file(out_path)
+        return geoframe.to_file(out_path, schema=schema, driver='ESRI Shapefile')
 
 
 def main():
@@ -39,17 +39,51 @@ def main():
     input_file = args.input
     output_file = args.output
 
+    dtype = {
+        'EASTING': 'int64',
+        'NORTHING': 'int64',
+        'GRIDREF': 'string',
+        'STATION_ID': 'int64',
+        'EVENT_DATE': 'object',
+        'SURVEYOR': 'string',
+        'GPS_ACC': 'string',
+        'DEPTH': 'int64',
+        'COND': 'string',
+        'NOTES': 'string',
+    }
+
+    schema = {
+    'geometry': 'Point',
+    'properties': {
+        'EASTING': 'int',
+        'NORTHING': 'int',
+        'GRIDREF': 'str',
+        'STATION_ID': 'int',
+        'EVENT_DATE': 'date',
+        'SURVEYOR': 'str',
+        'GPS_ACC': 'str',
+        'DEPTH': 'int',
+        'COND': 'str',
+        'NOTES': 'str',
+        'DM_NOTES': 'str'
+    }}
+
+
     print('Reading input spreadsheet\n')
 
-    df = file_read(input_file)
+    df = file_read(input_file, dtype)
 
     print(f'Spreadsheet contains {len(df)} records\n')
     print(f'writing to {output_file}\n')
 
+    
+
     gdf = gpd.GeoDataFrame(
         df, geometry=gpd.points_from_xy(df.EASTING, df.NORTHING), crs='EPSG:27700')
 
-    file_write(output_file, gdf)
+    gdf['DM_NOTES'] = ""
+
+    file_write(output_file, gdf, schema)
 
     print(f'Writing of {output_file} complete, exiting script\n')
 
