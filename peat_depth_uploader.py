@@ -10,6 +10,7 @@ from config import *
 from sqlalchemy import create_engine
 import argparse
 import geoalchemy2
+from geoalchemy2 import Geometry
 import geopandas as gpd
 import sys
 import re
@@ -91,6 +92,7 @@ def main():
     vector_file = args.filename
     survey_ref = args.survey_ref
     global_id = args.global_id
+    crs = "EPSG:27700"
 
     survey_ref_type = survey_ref_validator(survey_ref)
 
@@ -107,7 +109,8 @@ def main():
 
 
     # read in file as geodataframe
-    gdf = gpd.read_file(vector_file)
+    gdf = gpd.read_file(vector_file, crs=crs)
+    print(gdf.crs)
 
 
     # Allow user prompt to check information is correct
@@ -162,8 +165,8 @@ def main():
 
 
     # export to database using gpd.to_postgis, note this will drop existing table and replace
-    gdf.rename_geometry("geom").to_postgis(name=table, schema=schema, con=engine, if_exists='append', index=False)
-
+    gdf.rename_geometry("geom").to_postgis(name=table, schema=schema, con=engine, if_exists='append', index=False, dtype={'geom': Geometry(geometry_type='POINT', srid=27700)})
+    #rename_geometry("geom").
 
     print(f"\n{len(gdf)} records successfully uploaded to {schema}.{table}")
 

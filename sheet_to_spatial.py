@@ -79,7 +79,7 @@ def main():
     
 
     gdf = gpd.GeoDataFrame(
-        df, geometry=gpd.points_from_xy(df.EASTING, df.NORTHING), crs='EPSG:27700')
+        df, geometry=gpd.points_from_xy(df.EASTING, df.NORTHING), crs='epsg:27700')
 
     gdf['DM_NOTES'] = ""
 
