@@ -1,5 +1,7 @@
 # Peat depth survey uploader
 
+# NOTE: This has now been folded into (pa_restoration_data_model)[https://github.com/Scottish-Natural-Heritage/pa_restoration_data_model] 
+
 Python script to upload peat depth survey data to postgres database.
 
 ## Overview
