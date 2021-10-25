@@ -1,4 +1,4 @@
-# Peat depth survey uploader
+# DEPRECATED
 
 # NOTE: This repo is depcreicated and has now been folded into [pa_restoration_data_model](https://github.com/Scottish-Natural-Heritage/pa_restoration_data_model)
 
